@@ -21,20 +21,39 @@ class TranslationQuickFixProvider implements vscode.CodeActionProvider {
         range: vscode.Range
     ): vscode.CodeAction[] {
         const line = document.lineAt(range.start.line);
-        const untranslatedStringRegex = /'([^']+)'/g; // Detect strings in single quotes
-        
+        const untranslatedStringRegex = /'([^']+)'/g;
+
         const matches = [...line.text.matchAll(untranslatedStringRegex)];
         const actions: vscode.CodeAction[] = [];
 
         for (const match of matches) {
             const text = match[1];
-            if (!this.isTranslated(text)) {
+            const existingKey = this.findExistingKey(text);
+            
+            if (existingKey) {
+                // Create action to use existing translation
+                const action = new vscode.CodeAction(
+                    `Use existing translation key: '${existingKey}'`,
+                    vscode.CodeActionKind.QuickFix
+                );
+                action.edit = new vscode.WorkspaceEdit();
+                action.edit.replace(
+                    document.uri,
+                    new vscode.Range(
+                        new vscode.Position(range.start.line, match.index!),
+                        new vscode.Position(range.start.line, match.index! + match[0].length)
+                    ),
+                    `AppLocalizations.of(context).${existingKey}`
+                );
+                actions.push(action);
+            } else {
+                // Create action to add new translation
                 const action = new vscode.CodeAction(
                     `Add translation for '${text}'`,
                     vscode.CodeActionKind.QuickFix
                 );
                 action.command = {
-                    command: 'flutterArb.addTranslation',
+                    command: 'flutter-arb-localization-helper.addTranslation',
                     title: 'Add Translation',
                     arguments: [text]
                 };
@@ -45,27 +64,33 @@ class TranslationQuickFixProvider implements vscode.CodeActionProvider {
         return actions;
     }
 
-    private isTranslated(text: string): boolean {
+    private findExistingKey(text: string): string | null {
         try {
-            // Get the workspace folder
             const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
-            if (!workspaceFolder) return true;
-    
-            // Construct paths to ARB files
-            const enArbPath = path.join(workspaceFolder.uri.fsPath, 'lib', 'l10n', 'talenta_en.arb');
-            const idArbPath = path.join(workspaceFolder.uri.fsPath, 'lib', 'l10n', 'talenta_id.arb');
-    
-            // Check if files exist
-            if (!fs.existsSync(enArbPath) || !fs.existsSync(idArbPath)) {
-                return true;
-            }
-    
+            if (!workspaceFolder) return null;
+
+            const enArbPath = path.join(workspaceFolder.uri.fsPath, 'talenta', 'assets', 'l10n', 'talenta_en.arb');
+            if (!fs.existsSync(enArbPath)) return null;
+
             const enArb = JSON.parse(fs.readFileSync(enArbPath, 'utf8'));
-            return Object.values(enArb).includes(text);
+            
+            // Find the key for the given text
+            for (const [key, value] of Object.entries(enArb)) {
+                if (value === text) {
+                    return key;
+                }
+            }
+            
+            return null;
         } catch (error) {
-            console.error('Error checking translation:', error);
-            return true;
+            console.error('Error finding existing key:', error);
+            return null;
         }
+    }
+
+    private isTranslated(text: string): boolean {
+        const existingKey = this.findExistingKey(text);
+        return existingKey !== null;
     }
 }
 
@@ -88,9 +113,12 @@ async function addTranslation(text: string) {
     if (keyName && enTranslation && idTranslation) {
         // Update ARB files
         updateArbFiles(keyName, enTranslation, idTranslation);
-        
+
         // Run flutter gen-l10n
-        const terminal = vscode.window.createTerminal('Flutter L10n');
+        const terminal = vscode.window.terminals.length > 0
+            ? vscode.window.activeTerminal || vscode.window.terminals[0]
+            : vscode.window.createTerminal('Flutter L10n');
+
         terminal.sendText('flutter gen-l10n');
         terminal.show();
     }
@@ -103,8 +131,8 @@ function updateArbFiles(key: string, enText: string, idText: string) {
         return;
     }
 
-    const enArbPath = path.join(workspaceFolder.uri.fsPath, 'lib', 'l10n', 'talenta_en.arb');
-    const idArbPath = path.join(workspaceFolder.uri.fsPath, 'lib', 'l10n', 'talenta_id.arb');
+    const enArbPath = path.join(workspaceFolder.uri.fsPath, 'talenta', 'assets', 'l10n', 'talenta_en.arb');
+    const idArbPath = path.join(workspaceFolder.uri.fsPath, 'talenta', 'assets', 'l10n', 'talenta_id.arb');
 
     try {
         // Update English ARB
@@ -125,6 +153,6 @@ function updateArbFiles(key: string, enText: string, idText: string) {
 
         vscode.window.showInformationMessage('Translation files updated successfully');
     } catch (error) {
-        vscode.window.showErrorMessage('Failed to update translation files');
+        vscode.window.showErrorMessage(`Failed to update translation files: ${error}`);
     }
 }

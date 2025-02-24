@@ -1,8 +1,8 @@
 {
   "name": "flutter-arb-localization-helper",
-  "displayName": "flutter-arb-localization-helper",
+  "displayName": "Flutter ARB localization helper",
   "description": "Quick fix provider for Flutter ARB translations",
-  "version": "0.0.1",
+  "version": "0.0.5",
   "engines": {
     "vscode": "^1.97.0"
   },
