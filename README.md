@@ -118,6 +118,6 @@ MIT License. See [LICENSE](LICENSE)
 
 ## Author
 
-Your Name - [@naufaldiath](https://github.com/naufaldiath)
+Your Name - [@naufaldirfq](https://github.com/naufaldirfq)
 
-[https://github.com/naufaldiath/talenta-translation-helper](https://github.com/naufaldiath/talenta-translation-helper)
+[https://github.com/naufaldirfq/flutter-arb-localization-helper](https://github.com/naufaldirfq/flutter-arb-localization-helper)
