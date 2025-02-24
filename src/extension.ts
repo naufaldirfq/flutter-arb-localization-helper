@@ -3,6 +3,10 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 export function activate(context: vscode.ExtensionContext) {
+    // Register the command handler
+    let disposable = vscode.commands.registerCommand('flutter-arb-localization-helper.addTranslation', addTranslation);
+    context.subscriptions.push(disposable);
+
     // Register Quick Fix provider
     context.subscriptions.push(
         vscode.languages.registerCodeActionsProvider('dart', new TranslationQuickFixProvider(), {
@@ -30,7 +34,7 @@ class TranslationQuickFixProvider implements vscode.CodeActionProvider {
                     vscode.CodeActionKind.QuickFix
                 );
                 action.command = {
-                    command: 'talenta.addTranslation',
+                    command: 'flutterArb.addTranslation',
                     title: 'Add Translation',
                     arguments: [text]
                 };
@@ -42,12 +46,26 @@ class TranslationQuickFixProvider implements vscode.CodeActionProvider {
     }
 
     private isTranslated(text: string): boolean {
-        // Check if string exists in ARB files
-        const enArbPath = '/path/to/talenta_en.arb';
-        const idArbPath = '/path/to/talenta_id.arb';
-        
-        const enArb = JSON.parse(fs.readFileSync(enArbPath, 'utf8'));
-        return Object.values(enArb).includes(text);
+        try {
+            // Get the workspace folder
+            const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
+            if (!workspaceFolder) return true;
+    
+            // Construct paths to ARB files
+            const enArbPath = path.join(workspaceFolder.uri.fsPath, 'lib', 'l10n', 'talenta_en.arb');
+            const idArbPath = path.join(workspaceFolder.uri.fsPath, 'lib', 'l10n', 'talenta_id.arb');
+    
+            // Check if files exist
+            if (!fs.existsSync(enArbPath) || !fs.existsSync(idArbPath)) {
+                return true;
+            }
+    
+            const enArb = JSON.parse(fs.readFileSync(enArbPath, 'utf8'));
+            return Object.values(enArb).includes(text);
+        } catch (error) {
+            console.error('Error checking translation:', error);
+            return true;
+        }
     }
 }
 
@@ -79,16 +97,34 @@ async function addTranslation(text: string) {
 }
 
 function updateArbFiles(key: string, enText: string, idText: string) {
-    const enArbPath = '/path/to/talenta_en.arb';
-    const idArbPath = '/path/to/talenta_id.arb';
+    const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
+    if (!workspaceFolder) {
+        vscode.window.showErrorMessage('No workspace folder found');
+        return;
+    }
 
-    // Update English ARB
-    const enArb = JSON.parse(fs.readFileSync(enArbPath, 'utf8'));
-    enArb[key] = enText;
-    fs.writeFileSync(enArbPath, JSON.stringify(enArb, null, 4));
+    const enArbPath = path.join(workspaceFolder.uri.fsPath, 'lib', 'l10n', 'talenta_en.arb');
+    const idArbPath = path.join(workspaceFolder.uri.fsPath, 'lib', 'l10n', 'talenta_id.arb');
 
-    // Update Bahasa ARB
-    const idArb = JSON.parse(fs.readFileSync(idArbPath, 'utf8'));
-    idArb[key] = idText;
-    fs.writeFileSync(idArbPath, JSON.stringify(idArb, null, 4));
+    try {
+        // Update English ARB
+        let enArb: { [key: string]: string } = {};
+        if (fs.existsSync(enArbPath)) {
+            enArb = JSON.parse(fs.readFileSync(enArbPath, 'utf8'));
+        }
+        enArb[key] = enText;
+        fs.writeFileSync(enArbPath, JSON.stringify(enArb, null, 2));
+
+        // Update Bahasa ARB
+        let idArb: { [key: string]: string } = {};
+        if (fs.existsSync(idArbPath)) {
+            idArb = JSON.parse(fs.readFileSync(idArbPath, 'utf8'));
+        }
+        idArb[key] = idText;
+        fs.writeFileSync(idArbPath, JSON.stringify(idArb, null, 2));
+
+        vscode.window.showInformationMessage('Translation files updated successfully');
+    } catch (error) {
+        vscode.window.showErrorMessage('Failed to update translation files');
+    }
 }

@@ -1,23 +1,25 @@
 {
-  "name": "talenta-translation-helper",
-  "displayName": "Talenta Translation Helper",
-  "description": "Quick fix provider for Talenta translations",
+  "name": "flutter-arb-localization-helper",
+  "displayName": "flutter-arb-localization-helper",
+  "description": "Quick fix provider for Flutter ARB translations",
   "version": "0.0.1",
   "engines": {
-      "vscode": "^1.97.0"
+    "vscode": "^1.97.0"
   },
-  "categories": ["Other"],
+  "categories": [
+    "Other"
+  ],
   "activationEvents": [
-      "onLanguage:dart"
+    "onLanguage:dart"
   ],
   "main": "./out/extension.js",
   "contributes": {
-      "commands": [
-          {
-              "command": "talenta.addTranslation",
-              "title": "Add Translation"
-          }
-      ]
+    "commands": [
+      {
+        "command": "flutter-arb-localization-helper.addTranslation",
+        "title": "Add Translation"
+      }
+    ]
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",

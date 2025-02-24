@@ -1,6 +1,6 @@
-# Talenta Translation Helper
+# Flutter ARB Translation Helper
 
-> VS Code extension for managing translations in Talenta Flutter project
+> VS Code extension for managing translations in Flutter project
 
 ## Features
 
@@ -28,7 +28,7 @@ assets/
 2. Install via VS Code:
 
 ```bash
-code --install-extension talenta-translation-helper-0.0.1.vsix
+code --install-extension flutter-arb-localization-helper-0.0.1.vsix
 ```
 
 Or via Command Palette:
@@ -38,7 +38,7 @@ Or via Command Palette:
 
 ## Usage
 
-1. Open Dart file in Talenta project
+1. Open Dart file in Flutter project
 2. Hover over untranslated string
 3. Click lightbulb (⚡) or `Cmd+.`
 4. Select "Add Translation"
