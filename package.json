@@ -2,7 +2,8 @@
   "name": "flutter-arb-localization-helper",
   "displayName": "Flutter ARB localization helper",
   "description": "Quick fix provider for Flutter ARB translations",
-  "version": "0.0.5",
+  "version": "0.0.6",
+  "publisher": "naufaldirfq",
   "engines": {
     "vscode": "^1.97.0"
   },
@@ -19,7 +20,27 @@
         "command": "flutter-arb-localization-helper.addTranslation",
         "title": "Add Translation"
       }
-    ]
+    ],
+    "configuration": {
+      "title": "Flutter ARB Localization Helper",
+      "properties": {
+        "flutterArb.l10nPath": {
+          "type": "string",
+          "default": "lib/l10n",
+          "description": "Path to the l10n directory containing ARB files (relative to workspace root)"
+        },
+        "flutterArb.baseArbFile": {
+          "type": "string",
+          "default": "app_en.arb",
+          "description": "Base ARB file name (usually English)"
+        },
+        "flutterArb.targetArbFile": {
+          "type": "string",
+          "default": "app_id.arb",
+          "description": "Target ARB file name (translation target)"
+        }
+      }
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",

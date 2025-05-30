@@ -66,12 +66,12 @@ Text(localizations.labelSubmit),
 
 Updated ARB files:
 ```json
-// talenta_en.arb
+// app_en.arb
 {
   "labelSubmit": "Submit"
 }
 
-// talenta_id.arb
+// app_id.arb
 {
   "labelSubmit": "Kirim"
 }
@@ -118,6 +118,6 @@ MIT License. See [LICENSE](LICENSE)
 
 ## Author
 
-Your Name - [@naufaldirfq](https://github.com/naufaldirfq)
+Naufaldi Athallah Rifqi - [@naufaldirfq](https://github.com/naufaldirfq)
 
 [https://github.com/naufaldirfq/flutter-arb-localization-helper](https://github.com/naufaldirfq/flutter-arb-localization-helper)
