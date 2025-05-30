@@ -2,7 +2,7 @@
   "name": "flutter-arb-localization-helper",
   "displayName": "Flutter ARB localization helper",
   "description": "Quick fix provider for Flutter ARB translations",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "publisher": "naufaldirfq",
   "engines": {
     "vscode": "^1.97.0"

@@ -4,6 +4,11 @@ All notable changes to the "flutter-arb-localization-helper" extension will be d
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## [0.0.7] - 2025-05-30
+
+### Changed
+- Updated documentation in README.md
+
 ## [0.0.6] - 2025-05-28
 
 ### Added
